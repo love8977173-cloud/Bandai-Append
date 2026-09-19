@@ -13,7 +13,7 @@
     }
     @media (min-width: 1024px) {
       .catalog-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.75rem;
       }
     }
@@ -87,7 +87,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
-    const PAGE_SIZE = 12; // 總量維持每頁 12 項
+    const PAGE_SIZE = 12; // 每頁總量 12 項
 
     async function init() {
       try {
@@ -264,7 +264,7 @@
     function getItemsPerView() {
       const isMobile = window.innerWidth < 1024;
       if (currentViewMode === 'card') {
-        return 4; // 卡片模式無論PC或手機均一次閱覽 4 項
+        return 4; // 卡片模式無論PC或手機均一次閱覽 4 項 (2*2)
       } else {
         return isMobile ? 3 : 4; // 清單模式手機一次閱覽 3 項，PC一次閱覽 4 項
       }
