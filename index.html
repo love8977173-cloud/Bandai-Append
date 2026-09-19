@@ -21,49 +21,47 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
   <div>
-    <!-- 頂部排版重構：對應紅、藍、黃、綠、紫框需求 -->
+    <!-- 頂部排版重構：品牌名稱放大並置中、副標題放大、截止日期置右 -->
     <header class="sticky top-0 z-50 bg-slate-900/98 backdrop-blur border-b border-slate-800 px-3 py-3 shadow-lg">
       <div class="max-w-7xl mx-auto flex flex-col gap-2.5">
         
-        <!-- 第一行：紅框(商店名稱放大)、藍框(品牌標題置左並放大)、黃框(截止日期標題放大) -->
+        <!-- 第一行：左側商店名稱，中間放大品牌標題，右側黃框截止日期 -->
         <div class="flex items-center justify-between w-full gap-2">
-          <!-- 紅框：商店名稱字體放大 -->
-          <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3.5 py-2 rounded-xl border border-slate-700 shadow">
-            <span class="text-2xl">🤖</span>
-            <span class="text-base sm:text-lg font-extrabold text-slate-100 tracking-wide">爪哇魯多模型店</span>
+          <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3 py-1.5 rounded-lg border border-slate-700 shadow">
+            <span class="text-xl">🤖</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-100">爪哇魯多模型店</span>
           </div>
           
-          <!-- 藍框：品牌標題置左並且字體放大 -->
-          <div class="flex-1 text-left px-3">
-            <h1 id="headerBrand" class="text-lg sm:text-xl font-black tracking-wider text-amber-400">萬代模型預計到貨追加</h1>
+          <!-- 品牌名稱放大並置中 -->
+          <div class="flex-1 text-center px-2">
+            <h1 id="headerBrand" class="text-lg sm:text-2xl font-black tracking-wider text-amber-400">萬代模型預計到貨追加</h1>
           </div>
 
-          <!-- 黃框：截止日期欄位標題標示截止日期並放大範圍 -->
-          <div class="flex-shrink-0 bg-slate-800/90 px-4 py-2 rounded-xl border border-rose-500/50 shadow text-right">
-            <span class="text-xs sm:text-sm text-rose-300 font-bold mr-1">截止：</span>
-            <span id="headerCloseDate" class="text-base sm:text-lg font-black text-rose-400">09/28</span>
+          <div class="flex-shrink-0 bg-slate-800/90 px-3.5 py-1.5 rounded-lg border border-rose-500/50 shadow text-right">
+            <span class="text-xs text-rose-300 font-bold mr-1">截止：</span>
+            <span id="headerCloseDate" class="text-sm sm:text-base font-black text-rose-400">09/28</span>
           </div>
         </div>
 
-        <!-- 第二行：綠框 (副標題字體放大) -->
+        <!-- 第二行：副標題字體放大 -->
         <div class="text-center py-1.5 bg-slate-800/60 rounded-lg border border-slate-700 shadow-sm">
-          <p id="headerSubtitle" class="text-sm sm:text-base font-bold text-slate-200 tracking-wider">追加訂單欲單率極局，介意者請勿下單。</p>
+          <p id="headerSubtitle" class="text-sm sm:text-base font-bold text-slate-200 tracking-wider">追加訂單砍單率極高，介意者請勿下單。</p>
         </div>
 
-        <!-- 第三行：紫框 (搜尋框放大並置中) 與 呈列模式切換鈕 -->
+        <!-- 第三行：搜尋框放大並置中，搭配呈列模式切換鈕 -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
           <div class="bg-slate-800 p-0.5 rounded-lg border border-slate-700 flex text-xs font-semibold">
             <button id="btnCardMode" onclick="switchViewMode('card')" class="px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold">🔲 卡片 (2*N)</button>
             <button id="btnListMode" onclick="switchViewMode('list')" class="px-3.5 py-2 rounded-md text-slate-300 hover:text-white transition-all font-bold">📋 清單</button>
           </div>
           
-          <!-- 紫框：搜尋框放大並置中 -->
+          <!-- 搜尋框放大並置中 -->
           <div class="w-full sm:w-2/3 max-w-xl">
             <input id="searchInput" type="text" placeholder="🔍 搜尋條碼、品名關鍵字..." 
                    class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base text-center text-white placeholder-slate-400 shadow-inner">
           </div>
 
-          <div class="hidden sm:block w-32"></div> <!-- 平衡右側空間以維持搜尋框置中 -->
+          <div class="hidden sm:block w-32"></div>
         </div>
 
       </div>
@@ -95,6 +93,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
+    const PAGE_SIZE = 12; // 恢復每頁總計 12 項商品
 
     async function init() {
       try {
@@ -265,12 +264,12 @@
       `;
     }
 
-    function getPageSize() {
+    function getItemsPerView() {
       const isMobile = window.innerWidth < 1024;
       if (currentViewMode === 'card') {
-        return 4; // 卡片模式無論PC或手機均為每頁4項 (2*2)
+        return 4; // 卡片模式無論PC或手機均為一次閱覽 4 項 (2*2)
       } else {
-        return isMobile ? 3 : 4; // 清單模式手機3項，PC4項
+        return isMobile ? 3 : 4; // 清單模式手機一次閱覽 3 項，PC一次閱覽 4 項
       }
     }
 
@@ -280,13 +279,14 @@
       cardContainer.innerHTML = '';
       listContainer.innerHTML = '';
 
-      const pageSize = getPageSize();
+      const itemsPerView = getItemsPerView();
       const totalItems = filteredProducts.length;
-      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+      const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
       if (currentPage > totalPages) currentPage = totalPages;
 
-      const startIndex = (currentPage - 1) * pageSize;
-      const currentBatch = filteredProducts.slice(startIndex, startIndex + pageSize);
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + itemsPerView, totalItems);
+      const currentBatch = filteredProducts.slice(startIndex, endIndex);
 
       currentBatch.forEach(item => {
         if (currentViewMode === 'card') {
@@ -296,7 +296,7 @@
         }
       });
 
-      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (本頁 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
+      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (每頁12項, 畫面閱覽 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
       renderPaginationControls(totalPages);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
