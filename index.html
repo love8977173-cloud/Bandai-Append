@@ -87,7 +87,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
-    const PAGE_SIZE = 12; // 每頁總量 12 項
+    const PAGE_SIZE = 12; // 每頁完整加載 12 項商品
 
     async function init() {
       try {
@@ -261,28 +261,18 @@
       `;
     }
 
-    function getItemsPerView() {
-      const isMobile = window.innerWidth < 1024;
-      if (currentViewMode === 'card') {
-        return 4; // 卡片模式無論PC或手機均一次閱覽 4 項 (2*2)
-      } else {
-        return isMobile ? 3 : 4; // 清單模式手機一次閱覽 3 項，PC一次閱覽 4 項
-      }
-    }
-
     function renderPage() {
       const cardContainer = document.getElementById('productGrid');
       const listContainer = document.getElementById('productList');
       cardContainer.innerHTML = '';
       listContainer.innerHTML = '';
 
-      const itemsPerView = getItemsPerView();
       const totalItems = filteredProducts.length;
       const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
       if (currentPage > totalPages) currentPage = totalPages;
 
       const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const endIndex = Math.min(startIndex + itemsPerView, totalItems);
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalItems);
       const currentBatch = filteredProducts.slice(startIndex, endIndex);
 
       currentBatch.forEach(item => {
@@ -293,7 +283,7 @@
         }
       });
 
-      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (每頁12項, 畫面閱覽 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
+      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (本頁 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
       renderPaginationControls(totalPages);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
