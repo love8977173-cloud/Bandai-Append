@@ -21,21 +21,41 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
   <div>
-    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-3 py-2 shadow-md">
-      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div class="flex items-center space-x-2">
-          <span class="text-xl">🤖</span>
-          <h1 id="headerTitle" class="text-base sm:text-lg font-bold tracking-wider text-amber-400">爪哇魯多模型店 ｜ 預購目錄</h1>
-        </div>
+    <!-- 網頂重構：副標題列在紅框下方，品牌置中，截止日期置右 -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-3 py-2.5 shadow-md">
+      <div class="max-w-7xl mx-auto flex flex-col gap-2">
         
-        <div class="flex items-center gap-2 w-full sm:w-auto">
+        <!-- 第一行：品牌名稱置中，截止日期置右 -->
+        <div class="relative flex items-center justify-between w-full">
+          <div class="flex items-center space-x-2">
+            <span class="text-lg">🤖</span>
+            <span class="text-xs text-slate-400 font-semibold hidden sm:inline">爪哇魯多模型店</span>
+          </div>
+          
+          <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
+            <h1 id="headerBrand" class="text-sm sm:text-base font-bold tracking-wider text-amber-400">爪哇魯多模型店</h1>
+          </div>
+
+          <div class="text-right">
+            <span id="headerCloseDate" class="text-xs sm:text-sm font-bold text-rose-400 bg-slate-800/80 px-2 py-1 rounded border border-slate-700">截止: 09/28</span>
+          </div>
+        </div>
+
+        <!-- 第二行：紅框下方副標題欄位 -->
+        <div class="text-center pb-1 border-b border-slate-800/60">
+          <p id="headerSubtitle" class="text-xs sm:text-sm font-medium text-slate-300 tracking-wide">熱血現貨與預購專區</p>
+        </div>
+
+        <!-- 第三行：呈列模式切換鈕與搜尋欄位移至副標題下方 -->
+        <div class="flex items-center justify-between gap-2 pt-0.5">
           <div class="bg-slate-800 p-0.5 rounded-lg border border-slate-700 flex text-xs font-semibold">
             <button id="btnCardMode" onclick="switchViewMode('card')" class="px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 transition-all">🔲 卡片 (2*N)</button>
             <button id="btnListMode" onclick="switchViewMode('list')" class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white transition-all">📋 清單</button>
           </div>
           <input id="searchInput" type="text" placeholder="搜尋條碼、品名關鍵字..." 
-                 class="flex-1 sm:w-56 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-amber-400 text-xs">
+                 class="w-56 sm:w-72 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-amber-400 text-xs">
         </div>
+
       </div>
     </header>
 
@@ -65,7 +85,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
-    const PAGE_SIZE = 12;
+    const PAGE_SIZE = 4; // PC與手機卡片模式維持每頁4項(2*2)，清單模式PC4項/手機3項透過動態計算
 
     async function init() {
       try {
@@ -73,23 +93,23 @@
         allProducts = await res.json();
         filteredProducts = allProducts;
         
-        updateDynamicTitles();
+        updateDynamicHeaders();
         renderPage();
       } catch (err) {
         document.getElementById('productGrid').innerHTML = '<p class="text-rose-400 p-4">無法載入 data.json</p>';
       }
     }
 
-    function updateDynamicTitles() {
+    function updateDynamicHeaders() {
       if (allProducts.length === 0) return;
       let brand = allProducts[0].brand || "預購商品";
       let closeDate = allProducts[0].close_date || "依公告";
-      if (brand.includes("(")) {
-        brand = brand.split("(")[0].trim();
-      }
-      const titleStr = `${brand}預購目錄 ｜ ${closeDate} 截止`;
-      document.getElementById('pageTitle').innerText = titleStr + " - 爪哇魯多模型店";
-      document.getElementById('headerTitle').innerText = `爪哇魯多模型店 ｜ ${titleStr}`;
+      let subtitle = allProducts[0].subtitle || "熱血現貨與預購專區";
+
+      document.getElementById('pageTitle').innerText = `${brand}預購目錄 ｜ ${closeDate} 截止 - 爪哇魯多模型店`;
+      document.getElementById('headerBrand').innerText = brand;
+      document.getElementById('headerCloseDate').innerText = `截止: ${closeDate}`;
+      document.getElementById('headerSubtitle').innerText = subtitle;
     }
 
     function switchViewMode(mode) {
@@ -233,18 +253,28 @@
       `;
     }
 
+    function getPageSize() {
+      const isMobile = window.innerWidth < 1024;
+      if (currentViewMode === 'card') {
+        return 4; // 卡片模式無論PC或手機均為每頁4項 (2*2)
+      } else {
+        return isMobile ? 3 : 4; // 清單模式手機3項，PC4項
+      }
+    }
+
     function renderPage() {
       const cardContainer = document.getElementById('productGrid');
       const listContainer = document.getElementById('productList');
       cardContainer.innerHTML = '';
       listContainer.innerHTML = '';
 
+      const pageSize = getPageSize();
       const totalItems = filteredProducts.length;
-      const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
       if (currentPage > totalPages) currentPage = totalPages;
 
-      const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const currentBatch = filteredProducts.slice(startIndex, startIndex + PAGE_SIZE);
+      const startIndex = (currentPage - 1) * pageSize;
+      const currentBatch = filteredProducts.slice(startIndex, startIndex + pageSize);
 
       currentBatch.forEach(item => {
         if (currentViewMode === 'card') {
@@ -294,6 +324,10 @@
       const kw = e.target.value.toLowerCase().trim();
       filteredProducts = allProducts.filter(p => p.name.toLowerCase().includes(kw) || p.barcode.includes(kw) || p.brand.toLowerCase().includes(kw));
       currentPage = 1;
+      renderPage();
+    });
+
+    window.addEventListener('resize', () => {
       renderPage();
     });
 
