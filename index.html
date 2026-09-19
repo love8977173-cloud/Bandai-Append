@@ -1,11 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title id="pageTitle">爪哇魯多模型店 - 預購商品目錄</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* 防止 LINE 滾動橡皮筋回彈與亂跳頂部 */
+    html, body {
+      overscroll-behavior-y: none;
+      -webkit-overflow-scrolling: touch;
+    }
     .catalog-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -15,52 +20,77 @@
       .catalog-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1rem;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
-    .img-placeholder {
-      background: linear-gradient(110deg, #1e293b 8%, #334155 18%, #1e293b 33%);
-      background-size: 200% 100%;
-      animation: shine 1.5s linear infinite;
+    .card-img-container {
+      height: 190px;
     }
-    @keyframes shine {
-      to { background-position-x: -200%; }
+    @media (min-width: 640px) {
+      .card-img-container {
+        height: 240px;
+      }
+    }
+    @media (min-width: 1024px) {
+      .card-img-container {
+        height: 260px;
+      }
     }
   </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
   <div>
-    <header class="sticky top-0 z-50 bg-slate-900/98 backdrop-blur border-b border-slate-800 px-3 py-3 shadow-lg">
-      <div class="max-w-7xl mx-auto flex flex-col gap-2.5">
+    <!-- LINE 內置瀏覽器提示 Banner (偵測到 LINE 時自動顯示) -->
+    <div id="lineBrowserBanner" class="hidden bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-3 py-1.5 text-xs flex items-center justify-between shadow-md">
+      <div class="flex items-center space-x-1.5">
+        <span>💡</span>
+        <span>LINE內建瀏覽器可能影響滑動，建議用外部瀏覽器開啟</span>
+      </div>
+      <button onclick="openInExternalBrowser()" class="px-2.5 py-0.5 bg-white text-emerald-900 font-bold rounded-full text-[11px] shadow hover:bg-slate-100">
+        以瀏覽器開啟 ↗
+      </button>
+    </div>
+
+    <header class="sticky top-0 z-40 bg-slate-900/98 backdrop-blur border-b border-slate-800 px-3 py-2.5 shadow-lg">
+      <div class="max-w-7xl mx-auto flex flex-col gap-2">
         
         <div class="flex items-center justify-between w-full gap-2">
-          <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3 py-1.5 rounded-lg border border-slate-700 shadow">
-            <span class="text-xl">🤖</span>
+          <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3 py-1 rounded-lg border border-slate-700 shadow">
+            <span class="text-lg sm:text-xl">🤖</span>
             <span class="text-xs sm:text-sm font-bold text-slate-100">爪哇魯多模型店</span>
           </div>
           
           <div class="flex-1 text-center px-2">
-            <h1 id="headerBrand" class="text-lg sm:text-2xl font-black tracking-wider text-amber-400">萬代模型預計到貨追加</h1>
+            <h1 id="headerBrand" class="text-base sm:text-xl font-black tracking-wider text-amber-400">萬代模型預計到貨追加</h1>
           </div>
 
-          <div class="flex-shrink-0 bg-slate-800/90 px-3.5 py-1.5 rounded-lg border border-rose-500/50 shadow text-right">
-            <span class="text-xs text-rose-300 font-bold mr-1">截止：</span>
-            <span id="headerCloseDate" class="text-sm sm:text-base font-black text-rose-400">09/28</span>
+          <div class="flex items-center space-x-1.5">
+            <button onclick="openInExternalBrowser()" title="以手機預設瀏覽器開啟" 
+                    class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-xs font-semibold text-slate-200 flex items-center gap-1 shadow">
+              <span>🌐</span><span class="hidden sm:inline">瀏覽器開啟</span>
+            </button>
+            <div class="flex-shrink-0 bg-slate-800/90 px-3 py-1 rounded-lg border border-rose-500/50 shadow text-right">
+              <span class="text-xs text-rose-300 font-bold mr-1">截止：</span>
+              <span id="headerCloseDate" class="text-xs sm:text-sm font-black text-rose-400">09/28</span>
+            </div>
           </div>
         </div>
 
-        <div class="text-center py-1.5 bg-slate-800/60 rounded-lg border border-slate-700 shadow-sm">
+        <div class="text-center py-1 bg-slate-800/60 rounded-md border border-slate-700">
           <p id="headerSubtitle" class="text-sm sm:text-base font-bold text-slate-200 tracking-wider">追加訂單砍單率極高，介意者請勿下單。</p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-0.5">
           <div class="bg-slate-800 p-0.5 rounded-lg border border-slate-700 flex text-xs font-semibold">
-            <button id="btnCardMode" onclick="switchViewMode('card')" class="px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold">🔲 卡片 (2*N)</button>
+            <button id="btnCardMode" onclick="switchViewMode('card')" class="px-3 py-1.5 rounded-md bg-amber-500 text-slate-950 transition-all font-bold">🔲 卡片 (2*N)</button>
             <button id="btnListMode" onclick="switchViewMode('list')" class="px-3.5 py-2 rounded-md text-slate-300 hover:text-white transition-all font-bold">📋 清單</button>
           </div>
           
           <div class="w-full sm:w-2/3 max-w-xl">
             <input id="searchInput" type="text" placeholder="🔍 搜尋條碼、品名關鍵字..." 
-                   class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base text-center text-white placeholder-slate-400 shadow-inner">
+                   class="w-full px-4 py-1.5 rounded-xl bg-slate-800 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-xs sm:text-sm text-center text-white placeholder-slate-400 shadow-inner">
           </div>
 
           <div class="hidden sm:block w-32"></div>
@@ -71,7 +101,7 @@
 
     <main class="max-w-7xl mx-auto px-2 py-3">
       <div id="productGrid" class="catalog-grid"></div>
-      <div id="productList" class="hidden flex flex-col gap-2.5 max-w-5xl mx-auto"></div>
+      <div id="productList" class="hidden flex flex-col gap-2.5 max-w-4xl mx-auto"></div>
     </main>
   </div>
 
@@ -81,6 +111,22 @@
       <div class="flex items-center gap-1.5" id="paginationControls"></div>
     </div>
   </footer>
+
+  <!-- 外部瀏覽器開啟指引彈窗 (iOS LINE 專用) -->
+  <div id="lineGuideModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeLineGuide()">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full p-5 text-center shadow-2xl relative" onclick="event.stopPropagation()">
+      <div class="text-3xl mb-2">🧭</div>
+      <h3 class="text-base font-bold text-amber-400 mb-2">如何以手機瀏覽器開啟？</h3>
+      <div class="text-xs text-slate-300 space-y-2 text-left bg-slate-800/80 p-3.5 rounded-xl border border-slate-700">
+        <p>1. 點擊螢幕右上角或右下角選單「<strong class="text-white">⋯</strong>」或「<strong class="text-white">︙</strong>」。</p>
+        <p>2. 選擇「<strong class="text-amber-300">以預設瀏覽器開啟</strong>」或「<strong class="text-amber-300">以 Safari 開啟</strong>」。</p>
+        <p>3. 即可享受最流暢的完整排版與圖片閱覽！</p>
+      </div>
+      <button onclick="closeLineGuide()" class="mt-4 w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">
+        我知道了
+      </button>
+    </div>
+  </div>
 
   <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-3 cursor-zoom-out" onclick="closeModal()">
     <div class="relative max-w-3xl max-h-[90vh] flex flex-col items-center" onclick="event.stopPropagation()">
@@ -97,30 +143,40 @@
     let currentViewMode = 'card';
     const PAGE_SIZE = 12;
 
-    let imageObserver = null;
-
-    function initObserver() {
-      if ('IntersectionObserver' in window) {
-        if (imageObserver) imageObserver.disconnect();
-        imageObserver = new IntersectionObserver((entries, observer) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const img = entry.target;
-              const realSrc = img.dataset.src;
-              if (realSrc) {
-                img.src = realSrc;
-                img.onload = () => img.classList.remove('img-placeholder');
-              }
-              observer.unobserve(img);
-            }
-          });
-        }, { rootMargin: "150px 0px" });
+    // 檢測是否在 LINE 內置瀏覽器中打開
+    function checkLineBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isLine = ua.indexOf("Line") > -1;
+      if (isLine) {
+        document.getElementById('lineBrowserBanner').classList.remove('hidden');
       }
+    }
+
+    // 以外部預設瀏覽器打開的方案
+    function openInExternalBrowser() {
+      const currentUrl = window.location.href.split('?')[0];
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      
+      // Android: 使用 intent 跳轉預設 Chrome
+      if (/android/i.test(ua)) {
+        window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+      } else {
+        // iOS LINE: 彈出指引說明或利用 ?openExternalBrowser=1
+        if (ua.indexOf("Line") > -1) {
+          document.getElementById('lineGuideModal').classList.remove('hidden');
+        } else {
+          window.open(currentUrl, '_blank');
+        }
+      }
+    }
+
+    function closeLineGuide() {
+      document.getElementById('lineGuideModal').classList.add('hidden');
     }
 
     async function init() {
       try {
-        initObserver();
+        checkLineBrowser();
         const res = await fetch('data.json?t=' + Date.now());
         allProducts = await res.json();
         filteredProducts = allProducts;
@@ -152,13 +208,13 @@
       const listView = document.getElementById('productList');
 
       if (mode === 'card') {
-        btnCard.className = "px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold";
-        btnList.className = "px-3.5 py-2 rounded-md text-slate-300 hover:text-white transition-all font-bold";
+        btnCard.className = "px-3 py-1.5 rounded-md bg-amber-500 text-slate-950 transition-all font-bold";
+        btnList.className = "px-3 py-1.5 rounded-md text-slate-300 hover:text-white transition-all font-bold";
         cardView.classList.remove('hidden');
         listView.classList.add('hidden');
       } else {
-        btnList.className = "px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold";
-        btnCard.className = "px-3.5 py-2 rounded-md text-slate-300 hover:text-white transition-all font-bold";
+        btnList.className = "px-3 py-1.5 rounded-md bg-amber-500 text-slate-950 transition-all font-bold";
+        btnCard.className = "px-3 py-1.5 rounded-md text-slate-300 hover:text-white transition-all font-bold";
         listView.classList.remove('hidden');
         cardView.classList.add('hidden');
       }
@@ -199,11 +255,10 @@
       return `
         <div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden flex flex-col justify-between shadow hover:border-amber-400/40 transition-all text-xs">
           <div>
-            <div class="relative w-full aspect-square bg-slate-800 overflow-hidden cursor-zoom-in" 
+            <div class="relative w-full card-img-container bg-slate-800/80 overflow-hidden cursor-zoom-in flex items-center justify-center" 
                  onclick="openModal('${finalImg}', '${item.name.replace(/'/g, "\\'")}')">
-              <img data-src="${finalImg}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
-                   loading="lazy" decoding="async" alt="${item.name}" 
-                   class="lazy-img img-placeholder w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+              <img src="${finalImg}" loading="lazy" decoding="async" alt="${item.name}" 
+                   class="w-full h-full object-contain p-1 transition-transform duration-200 hover:scale-105"
                    onerror="handleImageError(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"/>
               <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 text-[10px] font-semibold bg-slate-950/80 text-amber-300 rounded backdrop-blur-sm">
                 ${item.brand}
@@ -215,30 +270,30 @@
             
             <div class="p-2 space-y-1">
               <div class="flex items-center justify-between text-[10px]">
-                <span class="text-slate-400 bg-slate-800 px-1 py-0.2 rounded">#${item.id}</span>
+                <span class="text-slate-400 bg-slate-800 px-1 py-0.5 rounded">#${item.id}</span>
                 <span class="font-mono text-amber-400/80 truncate ml-1">${item.barcode}</span>
               </div>
-              <h2 class="font-medium text-slate-100 line-clamp-2 leading-tight h-8" title="${item.name}">${item.name}</h2>
-              <div class="text-[10px] text-slate-400 flex justify-between pt-0.5">
-                <span>上市:${item.release_date}</span>
-                <span class="text-rose-400 font-semibold">截止:${item.close_date}</span>
+              <h2 class="font-semibold text-slate-100 line-clamp-2 leading-tight min-h-[2.25rem]" title="${item.name}">${item.name}</h2>
+              <div class="text-[10px] text-slate-400 flex justify-between pt-0.5 border-t border-slate-800/60">
+                <span>上市: ${item.release_date}</span>
+                <span class="text-rose-400 font-semibold">截止: ${item.close_date}</span>
               </div>
             </div>
           </div>
 
           <div class="p-2 pt-0 border-t border-slate-800/80 mt-1 space-y-1.5">
             <div class="flex items-baseline justify-between pt-1">
-              <span class="text-[10px] text-slate-400">特惠價</span>
-              <span class="text-sm font-bold text-amber-400">NT$ ${item.preorder_price}</span>
+              <span class="text-[10px] text-slate-400 font-medium">特惠價</span>
+              <span class="text-sm sm:text-base font-black text-amber-400">NT$ ${item.preorder_price}</span>
             </div>
             <div class="grid grid-cols-2 gap-1 pt-0.5">
               <button onclick="copyOrder('${item.barcode}', '${item.name.replace(/'/g, "\\'")}', ${item.preorder_price})" 
-                      class="py-1 px-1 text-[10px] sm:text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded transition-colors flex items-center justify-center truncate">
-                <span>📋 複製商品資訊</span>
+                      class="py-1 px-1 text-[10px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded transition-colors flex items-center justify-center truncate shadow-sm">
+                <span>📋 複製商品</span>
               </button>
               <a href="https://m.me/JavaRudo" target="_blank" rel="noopener noreferrer"
-                 class="py-1 px-1 text-[10px] sm:text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors flex items-center justify-center truncate">
-                <span>💬 FB私訊訂購</span>
+                 class="py-1 px-1 text-[10px] font-bold bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors flex items-center justify-center truncate shadow-sm">
+                <span>💬 私訊訂購</span>
               </a>
             </div>
           </div>
@@ -250,12 +305,10 @@
       const finalImg = getImageUrl(item);
       return `
         <div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow flex hover:border-amber-400/40 transition-all text-xs">
-          <div class="w-24 sm:w-28 aspect-square bg-slate-800 relative flex-shrink-0 cursor-zoom-in"
+          <div class="w-24 sm:w-32 aspect-square bg-slate-800/80 relative flex-shrink-0 cursor-zoom-in flex items-center justify-center p-1"
                onclick="openModal('${finalImg}', '${item.name.replace(/'/g, "\\'")}')">
-            <img data-src="${finalImg}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" 
-                 loading="lazy" decoding="async" alt="${item.name}" 
-                 class="lazy-img img-placeholder w-full h-full object-cover" 
-                 onerror="handleImageError(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"/>
+            <img src="${finalImg}" loading="lazy" decoding="async" alt="${item.name}" 
+                 class="w-full h-full object-contain" onerror="handleImageError(this, ${JSON.stringify(item).replace(/"/g, '&quot;')})"/>
           </div>
           <div class="flex-1 p-3 flex flex-col justify-between">
             <div>
@@ -263,23 +316,23 @@
                 <span class="font-medium text-slate-300">編號: #${item.id} ｜ ${item.brand}</span>
                 <span class="font-mono text-amber-400/90 text-xs">${item.barcode}</span>
               </div>
-              <h3 class="font-medium text-slate-100 text-sm mt-1 leading-snug line-clamp-2">${item.name}</h3>
+              <h3 class="font-semibold text-slate-100 text-sm mt-1 leading-snug line-clamp-2">${item.name}</h3>
               <p class="text-[11px] text-slate-400 mt-1">預定上市: <span class="font-mono text-slate-300">${item.release_date}</span> ｜ <span class="text-rose-400 font-medium">截止: ${item.close_date}</span></p>
             </div>
             
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2.5 border-t border-slate-800/80 gap-2 mt-2">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-slate-800/80 gap-2 mt-2">
               <div class="flex items-baseline gap-1.5">
-                <span class="text-[11px] text-slate-400">預購價</span>
+                <span class="text-[11px] text-slate-400 font-medium">預購價</span>
                 <span class="text-base font-black text-amber-400 font-mono">NT$ ${item.preorder_price}</span>
               </div>
               <div class="flex gap-2">
                 <button onclick="copyOrder('${item.barcode}', '${item.name.replace(/'/g, "\\'")}', ${item.preorder_price})" 
-                        class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded shadow-sm text-xs transition-colors flex items-center justify-center min-w-[110px]">
-                  📋 複製商品資訊
+                        class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded shadow-sm text-xs transition-colors flex items-center justify-center min-w-[95px]">
+                  📋 複製資訊
                 </button>
                 <a href="https://m.me/JavaRudo" target="_blank" rel="noopener noreferrer"
-                   class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow-sm text-xs transition-colors flex items-center justify-center min-w-[110px]">
-                  💬 FB私訊訂購
+                   class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded shadow-sm text-xs transition-colors flex items-center justify-center min-w-[95px]">
+                  💬 FB私訊
                 </a>
               </div>
             </div>
@@ -310,20 +363,8 @@
         }
       });
 
-      // 註冊圖片視口觀察器（滑到商品周圍 150px 才啟動讀取）
-      const lazyImages = document.querySelectorAll('.lazy-img');
-      if (imageObserver) {
-        lazyImages.forEach(img => imageObserver.observe(img));
-      } else {
-        lazyImages.forEach(img => {
-          img.src = img.dataset.src;
-          img.classList.remove('img-placeholder');
-        });
-      }
-
-      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (本頁 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
+      document.getElementById('pageInfo').innerText = `顯示第 ${currentPage} / ${totalPages} 頁 (本頁完整顯示 ${currentBatch.length} 項, 共 ${totalItems} 項)`;
       renderPaginationControls(totalPages);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function renderPaginationControls(totalPages) {
@@ -334,7 +375,13 @@
       prevBtn.innerText = "◀ 上一頁";
       prevBtn.disabled = (currentPage === 1);
       prevBtn.className = `px-2.5 py-1 rounded border border-slate-700 ${currentPage === 1 ? 'opacity-40 cursor-not-allowed' : 'bg-slate-800 hover:bg-amber-500 hover:text-slate-950 transition'}`;
-      prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; renderPage(); } };
+      prevBtn.onclick = () => { 
+        if (currentPage > 1) { 
+          currentPage--; 
+          renderPage(); 
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 僅在真正點擊換頁時才回到頂部
+        } 
+      };
       ctrls.appendChild(prevBtn);
 
       for (let i = 1; i <= totalPages; i++) {
@@ -344,7 +391,11 @@
           pBtn.className = "px-2.5 py-1 rounded font-bold bg-amber-500 text-slate-950 shadow";
         } else {
           pBtn.className = "px-2.5 py-1 rounded bg-slate-800 border border-slate-700 hover:bg-slate-700 transition";
-          pBtn.onclick = () => { currentPage = i; renderPage(); };
+          pBtn.onclick = () => { 
+            currentPage = i; 
+            renderPage(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // 僅點擊切頁時置頂
+          };
         }
         ctrls.appendChild(pBtn);
       }
@@ -353,7 +404,13 @@
       nextBtn.innerText = "下一頁 ▶";
       nextBtn.disabled = (currentPage === totalPages);
       nextBtn.className = `px-2.5 py-1 rounded border border-slate-700 ${currentPage === totalPages ? 'opacity-40 cursor-not-allowed' : 'bg-slate-800 hover:bg-amber-500 hover:text-slate-950 transition'}`;
-      nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; renderPage(); } };
+      nextBtn.onclick = () => { 
+        if (currentPage < totalPages) { 
+          currentPage++; 
+          renderPage(); 
+          window.scrollTo({ top: 0, behavior: 'smooth' }); // 僅點擊切頁時置頂
+        } 
+      };
       ctrls.appendChild(nextBtn);
     }
 
@@ -364,9 +421,7 @@
       renderPage();
     });
 
-    window.addEventListener('resize', () => {
-      renderPage();
-    });
+    // 【重大修復】：徹底移除 window.resize 重新 renderPage 導致的 scrollTo(0) 跳回頂部 Bug！
 
     function copyOrder(bc, name, price) {
       const text = `【預購登記】[${bc}] ${name} (NT$ ${price})`;
