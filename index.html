@@ -24,7 +24,6 @@
     <header class="sticky top-0 z-50 bg-slate-900/98 backdrop-blur border-b border-slate-800 px-3 py-3 shadow-lg">
       <div class="max-w-7xl mx-auto flex flex-col gap-2.5">
         
-        <!-- 第一行：品牌名稱放大並置中、截止日期置右 -->
         <div class="flex items-center justify-between w-full gap-2">
           <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3 py-1.5 rounded-lg border border-slate-700 shadow">
             <span class="text-xl">🤖</span>
@@ -41,12 +40,10 @@
           </div>
         </div>
 
-        <!-- 第二行：副標題放大 -->
         <div class="text-center py-1.5 bg-slate-800/60 rounded-lg border border-slate-700 shadow-sm">
           <p id="headerSubtitle" class="text-sm sm:text-base font-bold text-slate-200 tracking-wider">追加訂單砍單率極高，介意者請勿下單。</p>
         </div>
 
-        <!-- 第三行：搜尋框放大並置中 -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
           <div class="bg-slate-800 p-0.5 rounded-lg border border-slate-700 flex text-xs font-semibold">
             <button id="btnCardMode" onclick="switchViewMode('card')" class="px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold">🔲 卡片 (2*N)</button>
@@ -90,7 +87,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
-    const PAGE_SIZE = 12;
+    const PAGE_SIZE = 12; // 總量維持每頁 12 項
 
     async function init() {
       try {
@@ -151,18 +148,21 @@
     }
 
     function getImageUrl(item) {
-      const barcode = item.barcode || 'NO_BARCODE';
-      const subpath = item.img_subpath || `Default/${barcode}.webp`;
+      const subpath = item.img_subpath || `Default/${item.barcode || 'NO_BARCODE'}.webp`;
       return `./images/${subpath}?t=v2`;
     }
 
     function handleImageError(img, item) {
       const barcode = item.barcode || 'NO_BARCODE';
-      if (!img.dataset.triedJpg) {
+      const brand = item.brand || 'Default';
+      if (!img.dataset.triedSubpath) {
+        img.dataset.triedSubpath = "true";
+        img.src = `./images/${brand}/${barcode}.webp?t=v2`;
+      } else if (!img.dataset.triedJpg) {
         img.dataset.triedJpg = "true";
-        img.src = `./images/${item.brand || 'Default'}/${barcode}.jpg?t=v2`;
-      } else if (!img.dataset.triedWebpDirect) {
-        img.dataset.triedWebpDirect = "true";
+        img.src = `./images/${brand}/${barcode}.jpg?t=v2`;
+      } else if (!img.dataset.triedRoot) {
+        img.dataset.triedRoot = "true";
         img.src = `./images/${barcode}.webp?t=v2`;
       } else {
         img.onerror = null;
@@ -264,9 +264,9 @@
     function getItemsPerView() {
       const isMobile = window.innerWidth < 1024;
       if (currentViewMode === 'card') {
-        return 4;
+        return 4; // 卡片模式無論PC或手機均一次閱覽 4 項
       } else {
-        return isMobile ? 3 : 4;
+        return isMobile ? 3 : 4; // 清單模式手機一次閱覽 3 項，PC一次閱覽 4 項
       }
     }
 
