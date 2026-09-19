@@ -21,18 +21,16 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
   <div>
-    <!-- 頂部排版重構：品牌名稱放大並置中、副標題放大、截止日期置右 -->
     <header class="sticky top-0 z-50 bg-slate-900/98 backdrop-blur border-b border-slate-800 px-3 py-3 shadow-lg">
       <div class="max-w-7xl mx-auto flex flex-col gap-2.5">
         
-        <!-- 第一行：左側商店名稱，中間放大品牌標題，右側黃框截止日期 -->
+        <!-- 第一行：品牌名稱放大並置中、截止日期置右 -->
         <div class="flex items-center justify-between w-full gap-2">
           <div class="flex items-center space-x-2 flex-shrink-0 bg-slate-800/90 px-3 py-1.5 rounded-lg border border-slate-700 shadow">
             <span class="text-xl">🤖</span>
             <span class="text-xs sm:text-sm font-bold text-slate-100">爪哇魯多模型店</span>
           </div>
           
-          <!-- 品牌名稱放大並置中 -->
           <div class="flex-1 text-center px-2">
             <h1 id="headerBrand" class="text-lg sm:text-2xl font-black tracking-wider text-amber-400">萬代模型預計到貨追加</h1>
           </div>
@@ -43,19 +41,18 @@
           </div>
         </div>
 
-        <!-- 第二行：副標題字體放大 -->
+        <!-- 第二行：副標題放大 -->
         <div class="text-center py-1.5 bg-slate-800/60 rounded-lg border border-slate-700 shadow-sm">
           <p id="headerSubtitle" class="text-sm sm:text-base font-bold text-slate-200 tracking-wider">追加訂單砍單率極高，介意者請勿下單。</p>
         </div>
 
-        <!-- 第三行：搜尋框放大並置中，搭配呈列模式切換鈕 -->
+        <!-- 第三行：搜尋框放大並置中 -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1">
           <div class="bg-slate-800 p-0.5 rounded-lg border border-slate-700 flex text-xs font-semibold">
             <button id="btnCardMode" onclick="switchViewMode('card')" class="px-3.5 py-2 rounded-md bg-amber-500 text-slate-950 transition-all font-bold">🔲 卡片 (2*N)</button>
             <button id="btnListMode" onclick="switchViewMode('list')" class="px-3.5 py-2 rounded-md text-slate-300 hover:text-white transition-all font-bold">📋 清單</button>
           </div>
           
-          <!-- 搜尋框放大並置中 -->
           <div class="w-full sm:w-2/3 max-w-xl">
             <input id="searchInput" type="text" placeholder="🔍 搜尋條碼、品名關鍵字..." 
                    class="w-full px-4 py-2 rounded-xl bg-slate-800 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm sm:text-base text-center text-white placeholder-slate-400 shadow-inner">
@@ -93,7 +90,7 @@
     let filteredProducts = [];
     let currentPage = 1;
     let currentViewMode = 'card';
-    const PAGE_SIZE = 12; // 恢復每頁總計 12 項商品
+    const PAGE_SIZE = 12;
 
     async function init() {
       try {
@@ -267,9 +264,9 @@
     function getItemsPerView() {
       const isMobile = window.innerWidth < 1024;
       if (currentViewMode === 'card') {
-        return 4; // 卡片模式無論PC或手機均為一次閱覽 4 項 (2*2)
+        return 4;
       } else {
-        return isMobile ? 3 : 4; // 清單模式手機一次閱覽 3 項，PC一次閱覽 4 項
+        return isMobile ? 3 : 4;
       }
     }
 
